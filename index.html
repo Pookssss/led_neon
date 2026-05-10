@@ -214,10 +214,12 @@
 
         <!-- Add/Edit Slide Form -->
         <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; border: 1px solid var(--border-glass);">
-            <h3 id="form-title" style="margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px; margin-bottom: 15px;">
-                <i class="fa-solid fa-plus"></i> เพิ่มสไลด์ใหม่ (Add New Slide)
+            <h3 id="form-title" style="margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px; margin-bottom: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="window.appToggleForm()">
+                <span><i class="fa-solid fa-plus" id="form-icon"></i> <span id="form-title-text">เพิ่มสไลด์ใหม่ (Add New Slide)</span></span>
+                <i class="fa-solid fa-chevron-up" id="form-collapse-icon" style="transition: transform 0.3s; font-size: 0.9rem;"></i>
             </h3>
-            <div class="form-group">
+            <div id="form-content">
+                <div class="form-group">
                 <label>ข้อความ (Text)</label>
                 <input type="text" id="input-text" class="form-control" placeholder="พิมพ์ข้อความที่นี่..." autocomplete="off">
             </div>
@@ -263,6 +265,7 @@
                 <button class="btn btn-secondary" id="btn-cancel-edit" style="display: none; flex: 1;">
                     ยกเลิก
                 </button>
+            </div>
             </div>
         </div>
 
@@ -523,7 +526,13 @@
             if (!slide) return;
             
             editingSlideId = id;
-            document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-pen"></i> แก้ไขสไลด์ (Edit Slide)';
+            document.getElementById('form-icon').className = 'fa-solid fa-pen';
+            document.getElementById('form-title-text').innerText = 'แก้ไขสไลด์ (Edit Slide)';
+            
+            // Expand form if collapsed
+            if (document.getElementById('form-content').style.display === 'none') {
+                window.appToggleForm();
+            }
             document.getElementById('input-text').value = slide.text;
             
             // Set Color
@@ -544,7 +553,8 @@
 
         function cancelEdit() {
             editingSlideId = null;
-            document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-plus"></i> เพิ่มสไลด์ใหม่ (Add New Slide)';
+            document.getElementById('form-icon').className = 'fa-solid fa-plus';
+            document.getElementById('form-title-text').innerText = 'เพิ่มสไลด์ใหม่ (Add New Slide)';
             document.getElementById('input-text').value = '';
             document.getElementById('input-duration').value = '5';
             document.getElementById('input-effect').value = 'static';
@@ -654,10 +664,23 @@
             }
         }
 
+        function toggleFormCollapse() {
+            const content = document.getElementById('form-content');
+            const icon = document.getElementById('form-collapse-icon');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
         // Global exposing for inline handlers
         window.appShowSlide = (index) => { showSlide(index); };
         window.appDeleteSlide = (id) => { deleteSlide(id); };
         window.appEditSlide = (id) => { editSlide(id); };
+        window.appToggleForm = () => { toggleFormCollapse(); };
 
         // Events Setup
         function setupEvents() {
